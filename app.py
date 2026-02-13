@@ -40,6 +40,8 @@ with st.sidebar:
     if not modelos:
         st.warning("No hay archivos IFC en la carpeta 'modelos'")
         st.info("Agrega archivos .ifc a la carpeta 'modelos' en GitHub")
+        modelo_seleccionado = None
+        info = None
     else:
         # Selector de modelo
         modelo_seleccionado = st.selectbox(
@@ -67,7 +69,22 @@ with st.sidebar:
                     st.metric("Muros", info["muros"])
                     st.metric("Losas", info["losas"])
 
-    # ENLACES A VISORES EXTERNOS (ACTUALIZADO 2026)
+# Área principal - ESTO VA FUERA DEL SIDEBAR
+if modelos and modelo_seleccionado and info:
+    st.header(f"📐 {modelo_seleccionado}")
+    
+    # Generar URL raw del archivo en GitHub (CORREGIDA)
+    usuario = "jorgejuarez85"
+    repo = "visor-ifc"
+    rama = "main"
+    url_raw = f"https://raw.githubusercontent.com/{usuario}/{repo}/refs/heads/{rama}/modelos/{modelo_seleccionado}"
+    
+    # Información del archivo
+    with st.expander("🔗 URL directa del archivo IFC"):
+        st.code(url_raw, language="text")
+        st.caption("Esta URL puede usarse en cualquier visor web que soporte IFC")
+    
+    # ENLACES A VISORES EXTERNOS
     st.markdown("## 🌐 Abrir en visor web profesional")
     st.markdown("Haz clic en cualquiera de estos enlaces para ver el modelo en 3D:")
 
@@ -103,7 +120,7 @@ with st.sidebar:
         *Si los visores web fallan, descarga el archivo para usar en programas de escritorio (como BIMvision, Solibri, etc.).*
         """)
 
-       # Mensaje de ayuda contextual
+    # Mensaje de ayuda contextual
     st.info("💡 **Nota sobre visores web**: Estos servicios son externos y su disponibilidad puede cambiar. Si uno no carga, prueba con otro. La descarga directa del archivo IFC es la opción más segura.")
 
 else:
@@ -127,6 +144,6 @@ else:
     Los archivos IFC están almacenados en GitHub y se actualizan automáticamente.
     """)
 
-# Footer (este está fuera del if/else, al nivel de la indentación principal)
+# Footer (siempre visible)
 st.markdown("---")
 st.caption("Visor IFC - Modelos BIM accesibles vía web | Hecho con Streamlit y Python")
