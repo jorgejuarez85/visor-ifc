@@ -3,7 +3,8 @@ import ifcopenshell
 import os
 
 st.set_page_config(page_title="Visor IFC", layout="wide")
-st.title("🏗️ Visor IFC - Modo Sencillo")
+st.title("🏗️ Visor IFC - Enlaces a Visores Externos")
+st.markdown("Comparte este enlace con quien quieras. El modelo se carga en visores web profesionales.")
 
 # Función para listar modelos
 def get_modelos_disponibles():
@@ -22,6 +23,8 @@ def get_ifc_info(file_path):
             "pisos": len(list(ifc_file.by_type("IfcBuildingStorey"))),
             "puertas": len(list(ifc_file.by_type("IfcDoor"))),
             "ventanas": len(list(ifc_file.by_type("IfcWindow"))),
+            "muros": len(list(ifc_file.by_type("IfcWall"))),
+            "losas": len(list(ifc_file.by_type("IfcSlab"))),
         }
         return info
     except Exception as e:
@@ -36,6 +39,7 @@ with st.sidebar:
     
     if not modelos:
         st.warning("No hay archivos IFC en la carpeta 'modelos'")
+        st.info("Agrega archivos .ifc a la carpeta 'modelos' en GitHub")
     else:
         # Selector de modelo
         modelo_seleccionado = st.selectbox(
@@ -51,17 +55,21 @@ with st.sidebar:
             if info:
                 st.markdown("---")
                 st.subheader("📊 Estadísticas")
+                
+                # Mostrar métricas en columnas
                 col1, col2 = st.columns(2)
                 with col1:
-                    st.metric("Elementos", info["elementos"])
+                    st.metric("Elementos totales", info["elementos"])
+                    st.metric("Pisos", info["pisos"])
                     st.metric("Puertas", info["puertas"])
                 with col2:
-                    st.metric("Pisos", info["pisos"])
                     st.metric("Ventanas", info["ventanas"])
+                    st.metric("Muros", info["muros"])
+                    st.metric("Losas", info["losas"])
 
 # Área principal
 if modelos and modelo_seleccionado:
-    st.subheader(f"📐 Visualizando: {modelo_seleccionado}")
+    st.header(f"📐 {modelo_seleccionado}")
     
     # Generar URL raw del archivo en GitHub
     usuario = "jorgejuarez85"
@@ -69,108 +77,87 @@ if modelos and modelo_seleccionado:
     rama = "main"
     url_raw = f"https://raw.githubusercontent.com/{usuario}/{repo}/{rama}/modelos/{modelo_seleccionado}"
     
-    # Mostrar URL (opcional)
-    with st.expander("🔗 URL del archivo"):
+    # Información del archivo
+    with st.expander("🔗 URL directa del archivo IFC"):
         st.code(url_raw, language="text")
+        st.caption("Esta URL puede usarse en cualquier visor web que soporte IFC")
     
-     # VISOR xCave (recomendado para móvil)
-    st.markdown("### 🕶️ Visor 3D")
-    st.caption("Haz clic en el modelo para interactuar (zoom, rotar, etc.) - Optimizado para móvil")
+    # ENLACES A VISORES EXTERNOS (OPCIÓN 4 - LA MÁS SEGURA)
+    st.markdown("## 🌐 Abrir en visor web profesional")
+    st.markdown("Haz clic en cualquiera de estos enlaces para ver el modelo en 3D:")
     
-    # HTML con iframe a xCave
-    html_code = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <style>
-            body {{ 
-                margin: 0; 
-                overflow: hidden; 
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-                background-color: #f5f5f5;
-            }}
-            #info {{ 
-                position: absolute; 
-                top: 10px; 
-                left: 10px; 
-                right: 10px;
-                background: rgba(0,0,0,0.8); 
-                color: white; 
-                padding: 8px 16px; 
-                border-radius: 30px;
-                font-size: 14px;
-                z-index: 1000;
-                text-align: center;
-                backdrop-filter: blur(5px);
-                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            }}
-            .loading {{
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                color: #333;
-                font-size: 16px;
-            }}
-        </style>
-    </head>
-    <body>
-        <div id="info">🔄 Cargando modelo en xCave... (pocos segundos)</div>
-        <iframe 
-            src="https://xcave.app/embed?url={url_raw}&autoload=true"
-            width="100%" 
-            height="700px" 
-            style="border: none; background: white;"
-            allowfullscreen
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-        </iframe>
-        <script>
-            // Actualizar mensaje cuando cargue
-            setTimeout(function() {{
-                document.getElementById('info').innerHTML = '✅ Modelo listo - Usa gestos táctiles o ratón';
-            }}, 4000);
-            
-            // Detectar si es móvil
-            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {{
-                document.getElementById('info').innerHTML = '👆 Toca para rotar | Pellizca para zoom';
-            }}
-        </script>
-    </body>
-    </html>
-    """
+    col1, col2 = st.columns(2)
     
-    # Mostrar el visor
-    st.components.v1.html(html_code, height=720)
-    
-    # Instrucciones de uso
-    with st.expander("📖 Cómo usar el visor"):
-        st.markdown("""
-        - **Ratón / touch**: Rotar la vista
-        - **Rueda / pellizco**: Zoom
-        - **Botón derecho + arrastrar**: Panorámica
-        - **Haz clic en elementos**: Seleccionar (si el visor lo soporta)
+    with col1:
+        st.markdown("### 🏢 That Open Company")
+        st.markdown(f"""
+        [![That Open Company](https://img.shields.io/badge/Abrir%20en-That%20Open%20Company-blue?style=for-the-badge&logo=ifc)](https://platform.thatopen.com/apps/ifc-viewer?load={url_raw})
         
-        El visor puede tardar unos segundos en cargar dependiendo del tamaño del archivo.
+        *Visor profesional con muchas herramientas*
+        """)
+        
+        st.markdown("### 📱 BIM Surfer")
+        st.markdown(f"""
+        [![BIM Surfer](https://img.shields.io/badge/Abrir%20en-BIM%20Surfer-green?style=for-the-badge&logo=three.js)](https://bimsurfer.org/?load={url_raw})
+        
+        *Ligero y rápido, funciona bien en móvil*
         """)
     
-    # Opciones adicionales
-    st.markdown("---")
-    st.subheader("🔗 Compartir o descargar")
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown(f"[![IFC.js](https://img.shields.io/badge/🕶️-Abrir%20en%20IFC.js-blue)](https://ifcjs.github.io/ifcjs-crash-course/sample.html?load={url_raw})")
     with col2:
-        st.markdown(f"[![xCave](https://img.shields.io/badge/🌐-Abrir%20en%20xCave-green)](https://xcave.app/?load={url_raw})")
-    with col3:
-        st.markdown(f"[![Descargar](https://img.shields.io/badge/📥-Descargar%20IFC-orange)]({url_raw})")
+        st.markdown("### 🔷 IFC.js")
+        st.markdown(f"""
+        [![IFC.js](https://img.shields.io/badge/Abrir%20en-IFC.js-orange?style=for-the-badge&logo=javascript)](https://ifcjs.github.io/ifcjs-crash-course/sample.html?load={url_raw})
+        
+        *Código abierto, muy personalizable*
+        """)
+        
+        st.markdown("### 📥 Descargar")
+        st.markdown(f"""
+        [![Descargar](https://img.shields.io/badge/📥-Descargar%20IFC-red?style=for-the-badge)]({url_raw})
+        
+        *Para usar en BIMvision, Tekla, etc.*
+        """)
+    
+    # Instrucciones para compartir
+    st.markdown("---")
+    st.subheader("📲 Compartir con otros usuarios")
+    st.markdown(f"""
+    Simplemente comparte este enlace:
+    
+    `https://visor-ifc-dxojck8pjjvkvf5wcrnk5g.streamlit.app/`
+    
+    Los usuarios podrán:
+    1. Seleccionar el modelo
+    2. Ver estadísticas básicas
+    3. Elegir un visor web de su preferencia
+    4. Ver el modelo en 3D sin instalar nada
+    """)
+    
+    # Vista previa de propiedades
+    with st.expander("📋 Ver todas las propiedades del modelo"):
+        st.json(info)
 
 else:
+    # Mensaje de bienvenida cuando no hay modelo seleccionado
     st.info("👈 Selecciona un modelo del panel lateral para comenzar")
-    st.image("https://via.placeholder.com/800x400?text=Selecciona+un+modelo+IFC", use_container_width=True)
+    
+    st.markdown("""
+    ## 🎯 Cómo usar esta aplicación
+    
+    1. **Selecciona un modelo** en el panel izquierdo
+    2. **Revisa las estadísticas** del modelo
+    3. **Elige un visor web** de los disponibles
+    4. **Comparte el enlace** con quien quieras
+    
+    ### 📱 Funciona en:
+    - PC (Windows, Mac, Linux)
+    - Tablets (iPad, Android)
+    - Celulares (cualquier navegador moderno)
+    
+    ### 📂 Modelos disponibles
+    Los archivos IFC están almacenados en GitHub y se actualizan automáticamente.
+    """)
 
 # Footer
 st.markdown("---")
-st.caption("Visor IFC simplificado - Modelos almacenados en GitHub")
+st.caption("Visor IFC - Modelos BIM accesibles vía web | Hecho con Streamlit y Python")
