@@ -67,56 +67,46 @@ with st.sidebar:
                     st.metric("Muros", info["muros"])
                     st.metric("Losas", info["losas"])
 
-# Área principal
-if modelos and modelo_seleccionado:
-    st.header(f"📐 {modelo_seleccionado}")
+# ============================================
+# ENLACES A VISORES WEB VERIFICADOS (2026)
+# ============================================
+st.markdown("## 🌐 Abrir en visor web profesional")
+st.markdown("Haz clic en cualquiera de estos enlaces para ver el modelo en 3D:")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("### 🏢 That Open Company (Recomendado)")
+    st.markdown(f"""
+    [![That Open Company](https://img.shields.io/badge/Abrir%20en-That%20Open%20Company-blue?style=for-the-badge&logo=ifc)](https://platform.thatopen.com/apps/ifc-viewer?load={url_raw})
     
-    # Generar URL raw del archivo en GitHub
-    usuario = "jorgejuarez85"
-    repo = "visor-ifc"
-    rama = "main"
-    url_raw = f"https://raw.githubusercontent.com/{usuario}/{repo}/refs/heads/{rama}/modelos/{modelo_seleccionado}"
+    *Visor profesional muy completo y estable. Mejor opción actual.*
+    """)
+
+    st.markdown("### 🔷 IFC.js Viewer Oficial")
+    st.markdown(f"""
+    [![IFC.js](https://img.shields.io/badge/Abrir%20en-IFC.js%20Official-orange?style=for-the-badge&logo=javascript)](https://viewer.ifcjs.com/#?load={url_raw})
     
-    # Información del archivo
-    with st.expander("🔗 URL directa del archivo IFC"):
-        st.code(url_raw, language="text")
-        st.caption("Esta URL puede usarse en cualquier visor web que soporte IFC")
+    *Visor de referencia del proyecto IFC.js. Más fiable que el demo anterior.*
+    """)
+
+with col2:
+    st.markdown("### ⚡ WebIFCViewer (Alternativo)")
+    st.markdown(f"""
+    [![WebIFCViewer](https://img.shields.io/badge/Abrir%20en-WebIFCViewer-green?style=for-the-badge&logo=three.js)](https://webifcviewer.com/?load={url_raw})
     
-    # ENLACES A VISORES EXTERNOS (OPCIÓN 4 - LA MÁS SEGURA)
-    st.markdown("## 🌐 Abrir en visor web profesional")
-    st.markdown("Haz clic en cualquiera de estos enlaces para ver el modelo en 3D:")
+    *Visor muy ligero, rápido y que suele funcionar bien en móviles.*
+    """)
+
+    st.markdown("### 📥 Descargar archivo IFC")
+    st.markdown(f"""
+    [![Descargar](https://img.shields.io/badge/📥-Descargar%20IFC-red?style=for-the-badge)]({url_raw})
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("### 🏢 That Open Company")
-        st.markdown(f"""
-        [![That Open Company](https://img.shields.io/badge/Abrir%20en-That%20Open%20Company-blue?style=for-the-badge&logo=ifc)](https://platform.thatopen.com/apps/ifc-viewer?load={url_raw})
-        
-        *Visor profesional con muchas herramientas*
-        """)
-        
-        st.markdown("### 📱 BIM Surfer")
-        st.markdown(f"""
-        [![BIM Surfer](https://img.shields.io/badge/Abrir%20en-BIM%20Surfer-green?style=for-the-badge&logo=three.js)](https://bimsurfer.org/?load={url_raw})
-        
-        *Ligero y rápido, funciona bien en móvil*
-        """)
-    
-    with col2:
-        st.markdown("### 🔷 IFC.js")
-        st.markdown(f"""
-        [![IFC.js](https://img.shields.io/badge/Abrir%20en-IFC.js-orange?style=for-the-badge&logo=javascript)](https://ifcjs.github.io/ifcjs-crash-course/sample.html?load={url_raw})
-        
-        *Código abierto, muy personalizable*
-        """)
-        
-        st.markdown("### 📥 Descargar")
-        st.markdown(f"""
-        [![Descargar](https://img.shields.io/badge/📥-Descargar%20IFC-red?style=for-the-badge)]({url_raw})
-        
-        *Para usar en BIMvision, Tekla, etc.*
-        """)
+    *Si los visores web fallan, descarga el archivo para usar en programas de escritorio (como BIMvision, Solibri, etc.).*
+    """)
+
+# Mensaje de ayuda contextual
+st.info("💡 **Nota sobre visores web**: Estos servicios son externos y su disponibilidad puede cambiar. Si uno no carga, prueba con otro. La descarga directa del archivo IFC es la opción más segura.")
     
     # Instrucciones para compartir
     st.markdown("---")
