@@ -103,7 +103,7 @@ with st.sidebar:
         *Si los visores web fallan, descarga el archivo para usar en programas de escritorio (como BIMvision, Solibri, etc.).*
         """)
 
-    # Mensaje de ayuda contextual
+       # Mensaje de ayuda contextual
     st.info("💡 **Nota sobre visores web**: Estos servicios son externos y su disponibilidad puede cambiar. Si uno no carga, prueba con otro. La descarga directa del archivo IFC es la opción más segura.")
 
 else:
@@ -127,6 +127,6 @@ else:
     Los archivos IFC están almacenados en GitHub y se actualizan automáticamente.
     """)
 
-# Footer
+# Footer (este está fuera del if/else, al nivel de la indentación principal)
 st.markdown("---")
 st.caption("Visor IFC - Modelos BIM accesibles vía web | Hecho con Streamlit y Python")
