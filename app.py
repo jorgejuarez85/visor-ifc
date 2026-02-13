@@ -1,16 +1,9 @@
 import streamlit as st
 import ifcopenshell
-import tempfile
 import os
-import subprocess
-import sys
 
-st.set_page_config(page_title="Visor IFC Simplificado", layout="wide")
-st.title("🏗️ Visor IFC - Versión Simplificada")
-
-# Instalar dependencias necesarias (solo en Streamlit Cloud)
-if not os.path.exists("/tmp/ifc_convertido"):
-    os.makedirs("/tmp/ifc_convertido")
+st.set_page_config(page_title="Visor IFC", layout="wide")
+st.title("🏗️ Visor IFC - Modo Sencillo")
 
 # Función para listar modelos
 def get_modelos_disponibles():
@@ -20,7 +13,7 @@ def get_modelos_disponibles():
         return []
     return [f for f in os.listdir(modelos_dir) if f.endswith('.ifc')]
 
-# Función para obtener info del IFC
+# Función para obtener información básica del IFC
 def get_ifc_info(file_path):
     try:
         ifc_file = ifcopenshell.open(file_path)
@@ -30,98 +23,132 @@ def get_ifc_info(file_path):
             "puertas": len(list(ifc_file.by_type("IfcDoor"))),
             "ventanas": len(list(ifc_file.by_type("IfcWindow"))),
         }
-        return info, ifc_file
+        return info
     except Exception as e:
-        st.error(f"Error al leer IFC: {e}")
-        return None, None
+        st.error(f"Error al leer el archivo: {e}")
+        return None
 
 # Sidebar
 with st.sidebar:
-    st.header("📁 Modelos")
+    st.header("📁 Modelos disponibles")
+    
     modelos = get_modelos_disponibles()
     
     if not modelos:
         st.warning("No hay archivos IFC en la carpeta 'modelos'")
     else:
-        modelo = st.selectbox("Selecciona modelo:", modelos)
+        # Selector de modelo
+        modelo_seleccionado = st.selectbox(
+            "Elige un modelo:",
+            modelos,
+            index=0
+        )
         
-        if modelo:
-            ruta = os.path.join("modelos", modelo)
-            info, ifc_file = get_ifc_info(ruta)
+        if modelo_seleccionado:
+            ruta_modelo = os.path.join("modelos", modelo_seleccionado)
+            info = get_ifc_info(ruta_modelo)
             
             if info:
-                st.metric("Elementos totales", info["elementos"])
-                st.metric("Pisos", info["pisos"])
+                st.markdown("---")
+                st.subheader("📊 Estadísticas")
                 col1, col2 = st.columns(2)
                 with col1:
+                    st.metric("Elementos", info["elementos"])
                     st.metric("Puertas", info["puertas"])
                 with col2:
+                    st.metric("Pisos", info["pisos"])
                     st.metric("Ventanas", info["ventanas"])
 
 # Área principal
-if modelos and modelo:
-    st.header(f"📐 Modelo: {modelo}")
+if modelos and modelo_seleccionado:
+    st.subheader(f"📐 Visualizando: {modelo_seleccionado}")
     
-    # Mostrar información básica
-    st.subheader("📊 Estadísticas del modelo")
-    st.json(info)
+    # Generar URL raw del archivo en GitHub
+    usuario = "jorgejuarez85"
+    repo = "visor-ifc"
+    rama = "main"
+    url_raw = f"https://raw.githubusercontent.com/{usuario}/{repo}/{rama}/modelos/{modelo_seleccionado}"
     
-    # Opciones de visualización
-    st.subheader("👓 Visualización")
+    # Mostrar URL (opcional)
+    with st.expander("🔗 URL del archivo"):
+        st.code(url_raw, language="text")
     
-    opcion = st.radio(
-        "Elige método de visualización:",
-        ["Ver propiedades", "Exportar a HTML", "Ver estructura"]
-    )
+    # VISOR IFC.js
+    st.markdown("### 🕶️ Visor 3D")
+    st.caption("Haz clic en el modelo para interactuar (zoom, rotar, etc.)")
     
-    if opcion == "Ver propiedades":
-        if ifc_file:
-            # Mostrar propiedades de algunos elementos
-            st.write("**Primeros 5 elementos del modelo:**")
-            elementos = list(ifc_file.by_type("IfcProduct"))[:5]
-            for elem in elementos:
-                with st.expander(f"Elemento: {elem.is_a()}"):
-                    if hasattr(elem, "Name"):
-                        st.write(f"Nombre: {elem.Name}")
-                    if hasattr(elem, "Description"):
-                        st.write(f"Descripción: {elem.Description}")
-                    if hasattr(elem, "GlobalId"):
-                        st.write(f"ID: {elem.GlobalId}")
+    # HTML con iframe al visor IFC.js
+    html_code = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {{ margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }}
+            #info {{ 
+                position: absolute; 
+                top: 10px; 
+                left: 10px; 
+                background: rgba(0,0,0,0.7); 
+                color: white; 
+                padding: 5px 10px; 
+                border-radius: 20px;
+                font-size: 12px;
+                z-index: 1000;
+                pointer-events: none;
+            }}
+        </style>
+    </head>
+    <body>
+        <div id="info">Cargando modelo IFC...</div>
+        <iframe 
+            src="https://ifcjs.github.io/ifcjs-crash-course/sample.html?load={url_raw}"
+            width="100%" 
+            height="700px" 
+            style="border: none;"
+            allowfullscreen>
+        </iframe>
+        <script>
+            // Actualizar mensaje cuando cargue
+            setTimeout(function() {{
+                document.getElementById('info').innerHTML = '✅ Modelo cargado - Usa mouse/touch para navegar';
+            }}, 5000);
+        </script>
+    </body>
+    </html>
+    """
     
-    elif opcion == "Exportar a HTML":
-        st.info("""
-        Para visualización 3D completa, recomendamos:
+    # Mostrar el visor
+    st.components.v1.html(html_code, height=720)
+    
+    # Instrucciones de uso
+    with st.expander("📖 Cómo usar el visor"):
+        st.markdown("""
+        - **Ratón / touch**: Rotar la vista
+        - **Rueda / pellizco**: Zoom
+        - **Botón derecho + arrastrar**: Panorámica
+        - **Haz clic en elementos**: Seleccionar (si el visor lo soporta)
         
-        1. **BIMvision** (gratuito): https://bimvision.eu/
-        2. **IFC.js Viewer** online: https://viewer.ifcjs.com/
-        3. **xCave** (web): https://xcave.app/
-        
-        Puedes descargar el archivo IFC desde GitHub:
+        El visor puede tardar unos segundos en cargar dependiendo del tamaño del archivo.
         """)
-        
-        # Link de descarga directa desde GitHub
-        repo_url = "https://github.com/jorgejuarez85/visor-ifc/tree/main/modelos"
-        st.markdown(f"📥 [Descargar IFC desde GitHub]({repo_url})")
     
-    elif opcion == "Ver estructura":
-        if ifc_file:
-            st.write("**Jerarquía del modelo:**")
-            pisos = ifc_file.by_type("IfcBuildingStorey")
-            if pisos:
-                for piso in pisos[:3]:  # Mostrar primeros 3 pisos
-                    with st.expander(f"🏢 Piso: {piso.Name if piso.Name else 'Sin nombre'}"):
-                        st.write(f"ID: {piso.GlobalId}")
-                        st.write("Elementos en este piso:")
-                        # Buscar elementos relacionados
-                        for rel in ifc_file.by_type("IfcRelContainedInSpatialStructure"):
-                            if rel.RelatingStructure == piso:
-                                for elem in rel.RelatedElements[:5]:  # Primeros 5
-                                    st.write(f"- {elem.is_a()}")
-            else:
-                st.write("No se encontraron pisos definidos")
+    # Opciones adicionales
+    st.markdown("---")
+    st.subheader("🔗 Compartir o descargar")
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"[![IFC.js](https://img.shields.io/badge/🕶️-Abrir%20en%20IFC.js-blue)](https://ifcjs.github.io/ifcjs-crash-course/sample.html?load={url_raw})")
+    with col2:
+        st.markdown(f"[![xCave](https://img.shields.io/badge/🌐-Abrir%20en%20xCave-green)](https://xcave.app/?load={url_raw})")
+    with col3:
+        st.markdown(f"[![Descargar](https://img.shields.io/badge/📥-Descargar%20IFC-orange)]({url_raw})")
+
 else:
-    st.info("👈 Selecciona un modelo del panel lateral")
+    st.info("👈 Selecciona un modelo del panel lateral para comenzar")
+    st.image("https://via.placeholder.com/800x400?text=Selecciona+un+modelo+IFC", use_container_width=True)
 
 # Footer
 st.markdown("---")
-st.caption("Visor IFC Simplificado - Para visualización 3D completa, usa un visor dedicado")
+st.caption("Visor IFC simplificado - Modelos almacenados en GitHub")
