@@ -19,7 +19,7 @@ st.title("🏗️ Visor de Modelos IFC")
 st.markdown("---")
 
 # Función para listar modelos disponibles
-@st.cache_data
+
 def get_modelos_disponibles():
     """Lista los archivos IFC en la carpeta modelos"""
     modelos_dir = "modelos"
@@ -32,7 +32,7 @@ def get_modelos_disponibles():
     return modelos
 
 # Función para procesar y visualizar IFC
-@st.cache_data
+
 def procesar_ifc(file_path):
     """Procesa el archivo IFC y extrae información básica"""
     try:
