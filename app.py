@@ -73,47 +73,69 @@ if modelos and modelo_seleccionado:
     with st.expander("🔗 URL del archivo"):
         st.code(url_raw, language="text")
     
-    # VISOR IFC.js
+     # VISOR xCave (recomendado para móvil)
     st.markdown("### 🕶️ Visor 3D")
-    st.caption("Haz clic en el modelo para interactuar (zoom, rotar, etc.)")
+    st.caption("Haz clic en el modelo para interactuar (zoom, rotar, etc.) - Optimizado para móvil")
     
-    # HTML con iframe al visor IFC.js
+    # HTML con iframe a xCave
     html_code = f"""
     <!DOCTYPE html>
     <html>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <style>
-            body {{ margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }}
+            body {{ 
+                margin: 0; 
+                overflow: hidden; 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                background-color: #f5f5f5;
+            }}
             #info {{ 
                 position: absolute; 
                 top: 10px; 
                 left: 10px; 
-                background: rgba(0,0,0,0.7); 
+                right: 10px;
+                background: rgba(0,0,0,0.8); 
                 color: white; 
-                padding: 5px 10px; 
-                border-radius: 20px;
-                font-size: 12px;
+                padding: 8px 16px; 
+                border-radius: 30px;
+                font-size: 14px;
                 z-index: 1000;
-                pointer-events: none;
+                text-align: center;
+                backdrop-filter: blur(5px);
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            }}
+            .loading {{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: #333;
+                font-size: 16px;
             }}
         </style>
     </head>
     <body>
-        <div id="info">Cargando modelo IFC...</div>
+        <div id="info">🔄 Cargando modelo en xCave... (pocos segundos)</div>
         <iframe 
-            src="https://ifcjs.github.io/ifcjs-crash-course/sample.html?load={url_raw}"
+            src="https://xcave.app/embed?url={url_raw}&autoload=true"
             width="100%" 
             height="700px" 
-            style="border: none;"
-            allowfullscreen>
+            style="border: none; background: white;"
+            allowfullscreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
         </iframe>
         <script>
             // Actualizar mensaje cuando cargue
             setTimeout(function() {{
-                document.getElementById('info').innerHTML = '✅ Modelo cargado - Usa mouse/touch para navegar';
-            }}, 5000);
+                document.getElementById('info').innerHTML = '✅ Modelo listo - Usa gestos táctiles o ratón';
+            }}, 4000);
+            
+            // Detectar si es móvil
+            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {{
+                document.getElementById('info').innerHTML = '👆 Toca para rotar | Pellizca para zoom';
+            }}
         </script>
     </body>
     </html>
