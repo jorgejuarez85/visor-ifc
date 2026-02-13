@@ -75,7 +75,7 @@ if modelos and modelo_seleccionado:
     usuario = "jorgejuarez85"
     repo = "visor-ifc"
     rama = "main"
-    url_raw = f"https://raw.githubusercontent.com/{usuario}/{repo}/{rama}/modelos/{modelo_seleccionado}"
+    url_raw = f"https://raw.githubusercontent.com/{usuario}/{repo}/refs/heads/{rama}/modelos/{modelo_seleccionado}"
     
     # Información del archivo
     with st.expander("🔗 URL directa del archivo IFC"):
