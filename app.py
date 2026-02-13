@@ -67,65 +67,44 @@ with st.sidebar:
                     st.metric("Muros", info["muros"])
                     st.metric("Losas", info["losas"])
 
-# ============================================
-# ENLACES A VISORES WEB VERIFICADOS (2026)
-# ============================================
-st.markdown("## 🌐 Abrir en visor web profesional")
-st.markdown("Haz clic en cualquiera de estos enlaces para ver el modelo en 3D:")
+    # ENLACES A VISORES EXTERNOS (ACTUALIZADO 2026)
+    st.markdown("## 🌐 Abrir en visor web profesional")
+    st.markdown("Haz clic en cualquiera de estos enlaces para ver el modelo en 3D:")
 
-col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-with col1:
-    st.markdown("### 🏢 That Open Company (Recomendado)")
-    st.markdown(f"""
-    [![That Open Company](https://img.shields.io/badge/Abrir%20en-That%20Open%20Company-blue?style=for-the-badge&logo=ifc)](https://platform.thatopen.com/apps/ifc-viewer?load={url_raw})
-    
-    *Visor profesional muy completo y estable. Mejor opción actual.*
-    """)
+    with col1:
+        st.markdown("### 🏢 That Open Company (Recomendado)")
+        st.markdown(f"""
+        [![That Open Company](https://img.shields.io/badge/Abrir%20en-That%20Open%20Company-blue?style=for-the-badge&logo=ifc)](https://platform.thatopen.com/apps/ifc-viewer?load={url_raw})
 
-    st.markdown("### 🔷 IFC.js Viewer Oficial")
-    st.markdown(f"""
-    [![IFC.js](https://img.shields.io/badge/Abrir%20en-IFC.js%20Official-orange?style=for-the-badge&logo=javascript)](https://viewer.ifcjs.com/#?load={url_raw})
-    
-    *Visor de referencia del proyecto IFC.js. Más fiable que el demo anterior.*
-    """)
+        *Visor profesional muy completo y estable. Mejor opción actual.*
+        """)
 
-with col2:
-    st.markdown("### ⚡ WebIFCViewer (Alternativo)")
-    st.markdown(f"""
-    [![WebIFCViewer](https://img.shields.io/badge/Abrir%20en-WebIFCViewer-green?style=for-the-badge&logo=three.js)](https://webifcviewer.com/?load={url_raw})
-    
-    *Visor muy ligero, rápido y que suele funcionar bien en móviles.*
-    """)
+        st.markdown("### 🔷 IFC.js Viewer Oficial")
+        st.markdown(f"""
+        [![IFC.js](https://img.shields.io/badge/Abrir%20en-IFC.js%20Official-orange?style=for-the-badge&logo=javascript)](https://viewer.ifcjs.com/#?load={url_raw})
 
-    st.markdown("### 📥 Descargar archivo IFC")
-    st.markdown(f"""
-    [![Descargar](https://img.shields.io/badge/📥-Descargar%20IFC-red?style=for-the-badge)]({url_raw})
-    
-    *Si los visores web fallan, descarga el archivo para usar en programas de escritorio (como BIMvision, Solibri, etc.).*
-    """)
+        *Visor de referencia del proyecto IFC.js. Más fiable que el demo anterior.*
+        """)
 
-# Mensaje de ayuda contextual
-st.info("💡 **Nota sobre visores web**: Estos servicios son externos y su disponibilidad puede cambiar. Si uno no carga, prueba con otro. La descarga directa del archivo IFC es la opción más segura.")
-    
-    # Instrucciones para compartir
-    st.markdown("---")
-    st.subheader("📲 Compartir con otros usuarios")
-    st.markdown(f"""
-    Simplemente comparte este enlace:
-    
-    `https://visor-ifc-dxojck8pjjvkvf5wcrnk5g.streamlit.app/`
-    
-    Los usuarios podrán:
-    1. Seleccionar el modelo
-    2. Ver estadísticas básicas
-    3. Elegir un visor web de su preferencia
-    4. Ver el modelo en 3D sin instalar nada
-    """)
-    
-    # Vista previa de propiedades
-    with st.expander("📋 Ver todas las propiedades del modelo"):
-        st.json(info)
+    with col2:
+        st.markdown("### ⚡ WebIFCViewer (Alternativo)")
+        st.markdown(f"""
+        [![WebIFCViewer](https://img.shields.io/badge/Abrir%20en-WebIFCViewer-green?style=for-the-badge&logo=three.js)](https://webifcviewer.com/?load={url_raw})
+
+        *Visor muy ligero, rápido y que suele funcionar bien en móviles.*
+        """)
+
+        st.markdown("### 📥 Descargar archivo IFC")
+        st.markdown(f"""
+        [![Descargar](https://img.shields.io/badge/📥-Descargar%20IFC-red?style=for-the-badge)]({url_raw})
+
+        *Si los visores web fallan, descarga el archivo para usar en programas de escritorio (como BIMvision, Solibri, etc.).*
+        """)
+
+    # Mensaje de ayuda contextual
+    st.info("💡 **Nota sobre visores web**: Estos servicios son externos y su disponibilidad puede cambiar. Si uno no carga, prueba con otro. La descarga directa del archivo IFC es la opción más segura.")
 
 else:
     # Mensaje de bienvenida cuando no hay modelo seleccionado
