@@ -1,215 +1,197 @@
 import streamlit as st
 import ifcopenshell
-import ifcopenshell.geom
-import pyvista as pv
-from stpyvista import stpyvista
 import os
-import tempfile
-import numpy as np
 
-# Configuración de la página
-st.set_page_config(
-    page_title="Visor IFC", 
-    page_icon="🏗️",
-    layout="wide"
-)
+st.set_page_config(page_title="Visor BIM", layout="wide")
+st.title("🏗️ Visor de Modelos BIM")
+st.markdown("Comparte este enlace con tu equipo. Los modelos se ven directo en el celular.")
 
-# Título
-st.title("🏗️ Visor de Modelos IFC")
-st.markdown("---")
+# ============================================
+# FUNCIONES
+# ============================================
 
-# Función para listar modelos disponibles
-@st.cache_data
-def get_modelos_disponibles():
-    """Lista los archivos IFC en la carpeta modelos"""
+def get_archivos_disponibles():
+    """Lista todos los archivos en la carpeta modelos"""
     modelos_dir = "modelos"
     if not os.path.exists(modelos_dir):
         os.makedirs(modelos_dir)
-        # Crear un mensaje si no hay modelos
         return []
-    
-    modelos = [f for f in os.listdir(modelos_dir) if f.endswith('.ifc')]
-    return modelos
+    # Aceptamos .ifc, .pdf y .u3d
+    archivos = [f for f in os.listdir(modelos_dir) 
+                if f.endswith(('.ifc', '.pdf', '.u3d'))]
+    return sorted(archivos)
 
-# Función para procesar y visualizar IFC
-@st.cache_data
-def procesar_ifc(file_path):
-    """Procesa el archivo IFC y extrae información básica"""
+def get_ifc_info(file_path):
+    """Obtiene estadísticas de un archivo IFC"""
     try:
         ifc_file = ifcopenshell.open(file_path)
-        
-        # Obtener información básica
         info = {
-            "nombre": os.path.basename(file_path),
             "elementos": len(list(ifc_file.by_type("IfcProduct"))),
             "pisos": len(list(ifc_file.by_type("IfcBuildingStorey"))),
-            "espacios": len(list(ifc_file.by_type("IfcSpace"))),
             "puertas": len(list(ifc_file.by_type("IfcDoor"))),
             "ventanas": len(list(ifc_file.by_type("IfcWindow"))),
+            "muros": len(list(ifc_file.by_type("IfcWall"))),
+            "losas": len(list(ifc_file.by_type("IfcSlab"))),
         }
-        
-        return ifc_file, info
+        return info
     except Exception as e:
-        st.error(f"Error al procesar el archivo: {e}")
-        return None, None
+        st.error(f"Error al leer el archivo IFC: {e}")
+        return None
 
-# Función para visualizar en 3D
-def visualizar_ifc(ifc_file):
-    """Crea visualización 3D del modelo"""
-    plotter = pv.Plotter(window_size=[800, 600])
-    plotter.background_color = 'white'
+def mostrar_pdf_3d(url_raw, archivo_nombre):
+    """Muestra un PDF 3D con instrucciones"""
+    st.success("✅ **PDF 3D detectado** - Ideal para ver en celular")
     
-    settings = ifcopenshell.geom.settings()
-    settings.set(settings.USE_WORLD_COORDS, True)
+    st.markdown("""
+    ### 📱 Cómo ver el modelo 3D:
+    1. **Haz clic** en "Abrir PDF" (abajo)
+    2. El PDF se abrirá en tu navegador
+    3. **Toca el modelo** con un dedo para rotarlo
+    4. **Pellizca** con dos dedos para acercar/alejar
     
-    elementos_mostrados = 0
-    elementos_totales = len(list(ifc_file.by_type("IfcProduct")))
+    *No necesitas instalar nada. El visor 3D está dentro del PDF.*
+    """)
     
-    # Barra de progreso
-    progress_bar = st.progress(0)
+    # Botón grande para abrir
+    st.markdown(f"""
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{url_raw}" target="_blank" style="
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        ">📄 ABRIR PDF 3D</a>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Iterar sobre elementos (limitamos para rendimiento)
-    for i, element in enumerate(ifc_file.by_type("IfcProduct")[:200]):  # Límite de 200 elementos
-        try:
-            # Omitir aberturas
-            if element.is_a("IfcOpeningElement"):
-                continue
-                
-            shape = ifcopenshell.geom.create_shape(settings, element)
-            
-            # Convertir geometría a formato PyVista
-            vertices = np.array(shape.geometry.verts).reshape(-1, 3)
-            faces = np.array(shape.geometry.faces)
-            
-            # Crear celdas para PyVista
-            cells = []
-            for j in range(0, len(faces), faces[j] + 1 if j < len(faces) else 1):
-                if j < len(faces):
-                    n_points = faces[j]
-                    cells.append([n_points] + list(faces[j+1:j+1+n_points]))
-            
-            if cells:
-                # Aplanar celdas para PyVista
-                cells_flat = []
-                for cell in cells:
-                    cells_flat.extend(cell)
-                
-                # Crear malla
-                mesh = pv.PolyData(vertices, cells_flat)
-                
-                # Color según tipo de elemento
-                if element.is_a("IfcWall"):
-                    color = "lightgray"
-                elif element.is_a("IfcSlab"):
-                    color = "lightblue"
-                elif element.is_a("IfcDoor"):
-                    color = "brown"
-                elif element.is_a("IfcWindow"):
-                    color = "skyblue"
-                elif element.is_a("IfcRoof"):
-                    color = "red"
-                else:
-                    color = "lightgreen"
-                
-                plotter.add_mesh(mesh, color=color, show_edges=False, opacity=1.0)
-                elementos_mostrados += 1
-                
-        except Exception as e:
-            continue
-        
-        # Actualizar progreso
-        progress_bar.progress(min(i / elementos_totales, 1.0))
+    # Visor embebido de Google
+    st.markdown("### Vista previa:")
+    st.components.v1.html(f"""
+    <iframe 
+        src="https://docs.google.com/viewer?url={url_raw}&embedded=true" 
+        width="100%" 
+        height="600px" 
+        style="border: 2px solid #ddd; border-radius: 10px;">
+    </iframe>
+    """, height=620)
     
-    progress_bar.empty()
+    # Descarga
+    with open(os.path.join("modelos", archivo_nombre), "rb") as f:
+        pdf_bytes = f.read()
     
-    # Configurar cámara
-    plotter.camera_position = 'iso'
-    plotter.add_axes()
-    
-    return plotter, elementos_mostrados
+    st.download_button(
+        label="📥 Descargar PDF para ver sin internet",
+        data=pdf_bytes,
+        file_name=archivo_nombre,
+        mime="application/pdf"
+    )
 
-# Sidebar para selección de modelos
+def mostrar_u3d(url_raw, archivo_nombre):
+    """Muestra instrucciones para archivos U3D"""
+    st.info("🎯 **Archivo U3D detectado**")
+    
+    st.markdown("""
+    ### Para ver este modelo 3D:
+    
+    **Opción 1 (recomendada): Convertir a PDF**
+    1. Descarga el archivo .u3d
+    2. Ábrelo con **Nitro PDF** (Crear PDF → Desde archivo)
+    3. Sube el PDF resultante a GitHub
+    
+    **Opción 2 (rápida): Visor online**
+    """)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown(f"[Abrir en U3D Viewer Online](https://www.creators3d.com/online-viewer?file={url_raw})")
+    with col2:
+        st.markdown(f"[Descargar .u3d]({url_raw})")
+    
+    with open(os.path.join("modelos", archivo_nombre), "rb") as f:
+        st.download_button("📥 Descargar archivo U3D", f, archivo_nombre)
+
+def mostrar_ifc(info, url_raw):
+    """Muestra opciones para archivos IFC"""
+    st.markdown("### 🏗️ Modelo IFC")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Elementos", info["elementos"])
+        st.metric("Pisos", info["pisos"])
+    with col2:
+        st.metric("Puertas", info["puertas"])
+        st.metric("Ventanas", info["ventanas"])
+    
+    st.markdown("#### 🌐 Ver online:")
+    st.markdown(f"""
+    - [IFC.js Viewer](https://ifcjs.github.io/ifcjs-crash-course/sample.html?load={url_raw})
+    - [That Open Company](https://platform.thatopen.com/apps/ifc-viewer?load={url_raw})
+    - [Descargar IFC]({url_raw}) (para BIMvision)
+    """)
+
+# ============================================
+# INTERFAZ PRINCIPAL
+# ============================================
+
 with st.sidebar:
-    st.header("📁 Modelos Disponibles")
+    st.header("📁 Modelos disponibles")
+    archivos = get_archivos_disponibles()
     
-    # Obtener modelos
-    modelos = get_modelos_disponibles()
-    
-    if not modelos:
-        st.warning("No hay modelos IFC en la carpeta 'modelos'")
-        st.info("Agrega archivos .ifc a la carpeta 'modelos'")
+    if not archivos:
+        st.warning("No hay archivos en 'modelos'")
+        st.info("Sube archivos .ifc, .pdf o .u3d a GitHub")
+        archivo_seleccionado = None
     else:
-        # Selector de modelo
-        modelo_seleccionado = st.selectbox(
-            "Selecciona un modelo:",
-            modelos
-        )
+        archivo_seleccionado = st.selectbox("Elige un modelo:", archivos)
         
-        # Mostrar info del modelo seleccionado
-        if modelo_seleccionado:
-            ruta_modelo = os.path.join("modelos", modelo_seleccionado)
-            ifc_file, info = procesar_ifc(ruta_modelo)
+        if archivo_seleccionado:
+            st.caption(f"Tipo: **.{archivo_seleccionado.split('.')[-1]}**")
             
-            if info:
-                st.markdown("---")
-                st.header("📊 Información")
-                st.metric("Elementos totales", info["elementos"])
-                st.metric("Pisos", info["pisos"])
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.metric("Puertas", info["puertas"])
-                with col2:
-                    st.metric("Ventanas", info["ventanas"])
-    
-    st.markdown("---")
-    st.caption("Visor IFC - Administra tus modelos")
+            # Si es IFC, mostrar estadísticas en sidebar
+            if archivo_seleccionado.endswith('.ifc'):
+                ruta = os.path.join("modelos", archivo_seleccionado)
+                info = get_ifc_info(ruta)
+            else:
+                info = None
 
 # Área principal
-if modelos and modelo_seleccionado:
-    ruta_modelo = os.path.join("modelos", modelo_seleccionado)
-    ifc_file, info = procesar_ifc(ruta_modelo)
+if archivos and archivo_seleccionado:
+    st.header(f"📐 {archivo_seleccionado}")
     
-    if ifc_file:
-        col1, col2 = st.columns([2, 1])
-        
-        with col1:
-            st.header(f"📐 Vista 3D: {modelo_seleccionado}")
-            
-            # Botón para visualizar
-            if st.button("🔄 Cargar Visualización 3D"):
-                with st.spinner("Generando vista 3D..."):
-                    plotter, elementos_most = visualizar_ifc(ifc_file)
-                    stpyvista(plotter, key="pv_canvas")
-                    st.caption(f"Mostrando {elementos_most} de {info['elementos']} elementos")
-        
-        with col2:
-            st.header("📋 Propiedades")
-            
-            # Mostrar propiedades básicas
-            if info:
-                st.json(info)
-            
-            # Opción de descarga (solo para administradores - por IP o contraseña)
-            if st.checkbox("👑 Modo Administrador"):
-                with open(ruta_modelo, 'rb') as f:
-                    st.download_button(
-                        "📥 Descargar IFC",
-                        f,
-                        file_name=modelo_seleccionado,
-                        mime="application/octet-stream"
-                    )
+    # URL raw
+    url_raw = f"https://raw.githubusercontent.com/jorgejuarez85/visor-ifc/refs/heads/main/modelos/{archivo_seleccionado}"
+    
+    # Detectar tipo y mostrar
+    if archivo_seleccionado.endswith('.pdf'):
+        mostrar_pdf_3d(url_raw, archivo_seleccionado)
+    elif archivo_seleccionado.endswith('.u3d'):
+        mostrar_u3d(url_raw, archivo_seleccionado)
+    elif archivo_seleccionado.endswith('.ifc') and info:
+        mostrar_ifc(info, url_raw)
+    else:
+        st.error("Tipo de archivo no soportado o error al leer")
+
 else:
-    # Mensaje de bienvenida
-    st.info("👈 Selecciona un modelo del panel lateral para comenzar")
+    # Pantalla de bienvenida
+    st.info("👈 Selecciona un modelo del panel lateral")
+    st.markdown("""
+    ## 📱 Cómo compartir modelos con tu equipo
     
-    # Instrucciones
-    with st.expander("📖 ¿Cómo agregar modelos?"):
-        st.markdown("""
-        1. Crea una carpeta llamada **modelos** en el mismo lugar que app.py
-        2. Copia tus archivos .ifc dentro de la carpeta **modelos**
-        3. Actualiza la página
-        """)
+    1. **Sube tus archivos** a la carpeta `modelos` en GitHub
+    2. **Comparte este enlace** por WhatsApp
+    3. **Ellos abren y ven** directo en el celular
+    
+    ### Formatos soportados:
+    - **.pdf** → PDF 3D (recomendado, mejor experiencia)
+    - **.u3d** → Modelo 3D puro (requiere conversión o visor online)
+    - **.ifc** → Modelo IFC (para expertos)
+    """)
 
 # Footer
 st.markdown("---")
-st.markdown("🔗 **Comparte este enlace con los usuarios**")
+st.caption("Visor BIM para equipo - Hecho con Streamlit")
