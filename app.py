@@ -17,24 +17,26 @@ USUARIOS_VALIDOS = {
     "jjuarez": "opcid1",
     "jmoreno": "opcid1",
     "lcornejo": "opcid1",
+    "hagregu": "opcid1",
+    "jescudero": "opcid1",
     "wrivas": "opcid1"
 }
 
 # Base de datos de proyectos (todos visibles para cualquier usuario logueado)
 proyectos = {
-    "Distribución Gasto - Sector 1": {
+    "5504-DISTRITO1-FF": {
         "url": "https://www.dropbox.com/scl/fi/eppqcl9su92q54p7trww1/Dist-Gast-Sector-1.obj?rlkey=fipri74scohl760hubcsn7v4c&st=5ejnkyov&raw=1",
         "descripcion": "Modelo de referencia - Sector 1"
     },
-    "Distribución Gasto - Sector 2": {
+    "5504-DISTRITO2-FF": {
         "url": "https://www.dropbox.com/scl/fi/l12rxa96e2k85e8l01pfk/Dist-Gast-Sector-2.obj?rlkey=px7071peo3bdo6bbjwixvqedg&st=bbtj8u15&raw=1",
         "descripcion": "Modelo de referencia - Sector 2"
     },
-    "Distribución Gasto - Sector 3": {
+    "5504-DISTRITO3-FF": {
         "url": "https://www.dropbox.com/scl/fi/8u1il8qaptbar6ffdijum/Dist-Gast-Sector-3.obj?rlkey=ke81fvhzajglo1yc9er1twks5&st=0i7gaive&raw=1",
         "descripcion": "Modelo de referencia - Sector 3"
     },
-    "PUCP - Pabellón Z": {
+    "5550-PUCPPZ-WR": {
         "url": "https://www.dropbox.com/scl/fi/4h0g5mauxruaqflrkdgn0/pucp-pz.obj?rlkey=5r8xzzcpblnn1jqaohoswcp6t&st=aby04p02&raw=1",
         "descripcion": "Modelo de referencia - Pabellón Z"
     }
