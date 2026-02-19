@@ -33,8 +33,8 @@ proyectos = {
         "descripcion": "Modelo de referencia - Sector 2"
     },
     "5504-dist3-LevTop-FF": {
-        "url": "https://www.dropbox.com/scl/fi/r54em3tp0c2kgyd4etn0z/5504-dist3-LevTop-FF.obj?rlkey=dl34gmiiln4kmknr5vnqjsesd&st=1adnyt9x&dl=1"
-        "descripcion": "Modelo de referencia - Sector  con Levantamiento Topografico"
+        "url": "https://www.dropbox.com/scl/fi/r54em3tp0c2kgyd4etn0z/5504-dist3-LevTop-FF.obj?rlkey=dl34gmiiln4kmknr5vnqjsesd&st=1adnyt9x&dl=1",
+        "descripcion": "Modelo de referencia - Sector 3"
     },
     "5504-dist3-FF": {
         "url": "https://www.dropbox.com/scl/fi/8u1il8qaptbar6ffdijum/Dist-Gast-Sector-3.obj?rlkey=ke81fvhzajglo1yc9er1twks5&st=0i7gaive&raw=1",
