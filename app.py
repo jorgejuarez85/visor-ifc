@@ -35,6 +35,10 @@ proyectos = {
         "url": "https://www.dropbox.com/scl/fi/z9bnm1bb8edv5ptxiozmf/5504-Vel-FF.obj?rlkey=8mwyp6congz4wbn4v9u0byijc&st=7ow7qyl4&dl=1",
         "descripcion": "Modelo de referencia - velarias"
     },
+       "5504-Velarias con manta-FF": {
+        "url": "https://www.dropbox.com/scl/fi/bkfqes85qkbcr5pepf5nz/5504-Vel_con_Manta-FF.obj?rlkey=r0wd8lsobr7g5o58o4wnqfb0j&st=xlmbskyb&dl=1",
+        "descripcion": "Modelo de referencia - velarias con manta"
+    },
     "5504-dist3-LevTop-FF": {
         "url": "https://www.dropbox.com/scl/fi/r54em3tp0c2kgyd4etn0z/5504-dist3-LevTop-FF.obj?rlkey=dl34gmiiln4kmknr5vnqjsesd&st=1adnyt9x&dl=1",
         "descripcion": "Modelo de referencia - Sector 3"
