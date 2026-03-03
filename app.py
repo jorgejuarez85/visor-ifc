@@ -31,6 +31,10 @@ proyectos = {
         "url": "https://www.dropbox.com/scl/fi/l12rxa96e2k85e8l01pfk/Dist-Gast-Sector-2.obj?rlkey=px7071peo3bdo6bbjwixvqedg&st=bbtj8u15&raw=1",
         "descripcion": "Modelo de referencia - Sector 2"
     },
+       "5504-Velarias-FF": {
+        "url": "https://www.dropbox.com/scl/fi/z9bnm1bb8edv5ptxiozmf/5504-Vel-FF.obj?rlkey=8mwyp6congz4wbn4v9u0byijc&st=7ow7qyl4&dl=1",
+        "descripcion": "Modelo de referencia - velarias"
+    },
     "5504-dist3-LevTop-FF": {
         "url": "https://www.dropbox.com/scl/fi/r54em3tp0c2kgyd4etn0z/5504-dist3-LevTop-FF.obj?rlkey=dl34gmiiln4kmknr5vnqjsesd&st=1adnyt9x&dl=1",
         "descripcion": "Modelo de referencia - Sector 3"
