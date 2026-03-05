@@ -16,7 +16,7 @@ USUARIOS_VALIDOS = {
     "syauri": "opcid1",
     "jmoreno": "opcid1",
     "lcornejo": "opcid1",
-    "hagregu": "opcid1",
+    "habregu": "opcid1",
     "jescudero": "opcid1",
     "wrivas": "opcid1"
 }
